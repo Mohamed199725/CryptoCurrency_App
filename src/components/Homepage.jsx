@@ -21,11 +21,16 @@ const Homepage = () => {
   const totalMarketCap = numeric(globalMarketData?.data?.total_market_cap?.usd);
   const coins = data?.data?.coins || [];
   const dataUnavailable = isError || !data?.data?.stats;
-  const chartCoins = coins.slice(0, 10).filter((coin) => numeric(coin.change) != null);
+  const changedCoins = coins
+    .map((coin) => ({ coin, change: numeric(coin.change) }))
+    .filter((entry) => entry.change != null);
+  const gainers = changedCoins.filter((entry) => entry.change > 0).sort((a, b) => b.change - a.change).slice(0, 10);
+  const losers = changedCoins.filter((entry) => entry.change < 0).sort((a, b) => a.change - b.change).slice(0, 10);
+  const chartCoins = [...gainers, ...losers];
   const capCoins = coins.slice(0, 5).filter((coin) => numeric(coin.marketCap) > 0);
-  const barData = { labels: chartCoins.map((coin) => coin.symbol), datasets: [{
-    label: '24h change', data: chartCoins.map((coin) => numeric(coin.change)),
-    backgroundColor: chartCoins.map((coin) => numeric(coin.change) >= 0 ? 'rgba(86,224,192,.82)' : 'rgba(255,112,133,.82)'),
+  const barData = { labels: chartCoins.map(({ coin }) => coin.symbol), datasets: [{
+    label: '24h change', data: chartCoins.map(({ change }) => change),
+    backgroundColor: chartCoins.map(({ change }) => change >= 0 ? 'rgba(86,224,192,.82)' : 'rgba(255,112,133,.82)'),
     borderRadius: 6, borderSkipped: false, barThickness: 20,
   }] };
   const marketCapData = { labels: capCoins.map((coin) => coin.symbol), datasets: [{
@@ -35,10 +40,10 @@ const Homepage = () => {
   const axisColor = '#a7b4c4';
   const barOptions = {
     responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ` ${ctx.parsed.y > 0 ? '+' : ''}${ctx.parsed.y.toFixed(2)}% over 24 hours` } } },
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ` ${ctx.parsed.x > 0 ? '+' : ''}${ctx.parsed.x.toFixed(2)}% over 24 hours` } } },
     scales: {
-      x: { grid: { display: false }, ticks: { color: axisColor, font: { family: 'Inter, sans-serif', weight: 600 } }, border: { display: false } },
-      y: { beginAtZero: true, grid: { color: 'rgba(148,163,184,.15)' }, ticks: { color: axisColor, callback: (value) => `${Number(value) > 0 ? '+' : ''}${value}%` }, border: { display: false } },
+      x: { grid: { color: (context) => Number(context.tick.value) === 0 ? 'rgba(220,232,242,.7)' : 'rgba(148,163,184,.15)', lineWidth: (context) => Number(context.tick.value) === 0 ? 2 : 1 }, ticks: { color: axisColor, font: { family: 'Inter, sans-serif', weight: 600 }, callback: (value) => `${Number(value) > 0 ? '+' : ''}${Number(value).toFixed(0)}%` }, border: { display: false } },
+      y: { grid: { display: false }, ticks: { color: axisColor, font: { family: 'Inter, sans-serif', weight: 600 } }, border: { display: false } },
     },
   };
   const doughnutOptions = { responsive: true, maintainAspectRatio: false, cutout: '72%', plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ` ${ctx.label}: $${millify(ctx.raw, { precision: 2 })}` } } } };
@@ -56,8 +61,8 @@ const Homepage = () => {
       <Col xs={12} xl={6}><Card className="stat-card"><Text className="stat-label">ACTIVE EXCHANGES</Text><Statistic value={compactCount(globalStats.totalExchanges)} /><Text className="stat-foot">Markets worldwide</Text></Card></Col>
     </Row>
     <Row gutter={[14, 14]} className="market-charts">
-      <Col xs={24} xl={16}><Card className="panel-card performance-panel"><div className="panel-heading"><div><Text className="panel-kicker">MARKET MOMENTUM</Text><Title level={4}>24-hour price performance</Title></div><Tag className="subtle-tag">TOP 10 · USD</Tag></div>
-        <div className="chart-canvas performance-chart">{chartCoins.length ? <Bar data={barData} options={barOptions} /> : <div className="chart-empty">Verified 24-hour changes will appear when the market feed is connected.</div>}</div><Text className="chart-caption">Percentage price change over the trailing 24 hours · source: CoinRanking</Text>
+      <Col xs={24} xl={16}><Card className="panel-card performance-panel"><div className="panel-heading"><div><Text className="panel-kicker">MARKET MOMENTUM</Text><Title level={4}>24-hour price performance</Title></div><Tag className="subtle-tag">TOP 10 GAINERS + LOSERS · USD</Tag></div>
+        <div className="chart-canvas performance-chart" style={{ height: Math.max(220, chartCoins.length * 22) }}>{chartCoins.length ? <Bar data={barData} options={{ ...barOptions, indexAxis: 'y' }} /> : <div className="chart-empty">Verified 24-hour changes will appear when the market feed is connected.</div>}</div><Text className="chart-caption">Best 10 positive and worst 10 negative reported changes among the 100 loaded assets. Green bars are gains; red bars are losses · source: CoinRanking</Text>
       </Card></Col>
       <Col xs={24} xl={8}><Card className="panel-card allocation-panel"><div className="panel-heading"><div><Text className="panel-kicker">MARKET COMPOSITION</Text><Title level={4}>Top 5 by market cap</Title></div></div>
         <div className="allocation-content"><div className="chart-canvas donut-chart">{capCoins.length ? <><Doughnut data={marketCapData} options={doughnutOptions} /><div className="donut-center"><span>TOP 5</span><strong>CAP</strong></div></> : <div className="chart-empty">Market-cap data unavailable</div>}</div>

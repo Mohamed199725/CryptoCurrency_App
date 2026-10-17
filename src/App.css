@@ -269,11 +269,42 @@ a:hover { color:var(--accent)!important; }
 .breadth-legend-row { display:grid; grid-template-columns:10px 1fr auto; align-items:center; gap:7px; color:#c4cfdb; font-size:10px; }
 .breadth-legend-row strong { color:#eef3f8; font-size:11px; }
 .advanced-empty { min-height:150px; display:flex; align-items:center; justify-content:center; }
+@media (max-width:1199px) {
+  .advanced-panel { min-height:0; }
+  .advanced-volume-chart { height:300px; }
+  .breadth-content { justify-content:flex-start; gap:32px; }
+}
+@media (max-width:800px) {
+  .advanced-market-section { margin-top:28px; }
+  .advanced-section-heading { margin-bottom:13px; }
+  .advanced-stat-card .ant-card-body { padding:15px 14px 13px; }
+  .advanced-stat-card .stat-label { display:block; min-height:2.5em; line-height:1.35; }
+  .advanced-stat-card .ant-statistic-content { font-size:clamp(18px,3.4vw,23px)!important; }
+  .advanced-stat-card .stat-foot { min-height:2.4em; line-height:1.4; }
+  .advanced-volume-chart { height:280px; }
+  .breadth-content { justify-content:center; }
+  .advanced-charts-row { row-gap:14px; }
+  .advanced-panel .ant-card-body { padding:18px 17px 14px; }
+}
 @media (max-width:700px) {
   .advanced-section-heading { align-items:flex-start; flex-direction:column; gap:9px; }
-  .advanced-subtitle { max-width:100%; }
-  .advanced-volume-chart { height:230px; }
-  .breadth-content { flex-direction:column; gap:14px; padding:12px 0; }
-  .breadth-chart { width:185px; height:185px; }
-  .breadth-legend { width:min(280px,100%); }
+  .advanced-subtitle { max-width:100%; font-size:10px; line-height:1.5; }
+  .advanced-stat-card .ant-card-body { padding:13px 11px 11px; }
+  .advanced-stat-card .stat-label { font-size:8px!important; letter-spacing:.6px; min-height:2.7em; }
+  .advanced-stat-card .ant-statistic-content { font-size:clamp(16px,5vw,20px)!important; }
+  .advanced-stat-card .stat-foot { font-size:9px; min-height:3em; }
+  .advanced-volume-chart { height:250px; }
+  .breadth-content { flex-direction:row; gap:20px; padding:12px 0; }
+  .breadth-chart { width:min(48vw,185px); height:min(48vw,185px); }
+  .breadth-legend { width:auto; min-width:120px; }
+  .advanced-panel .ant-card-body { padding:15px 12px 12px; }
+  .advanced-panel .panel-heading h4 { font-size:14px!important; }
+  .advanced-panel .panel-kicker { font-size:9px!important; }
+  .advanced-panel .chart-caption { line-height:1.5; }
+}
+@media (max-width:380px) {
+  .breadth-content { flex-direction:column; gap:10px; }
+  .breadth-chart { width:170px; height:170px; }
+  .breadth-legend { width:100%; max-width:250px; }
+  .advanced-stat-card .ant-statistic-content { font-size:15px!important; }
 }

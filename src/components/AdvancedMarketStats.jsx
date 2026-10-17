@@ -29,22 +29,18 @@ const AdvancedMarketStats = ({ coins = [], stats = {}, isError = false, updatedA
   const down = changes.filter((change) => change < 0).length;
   const unchanged = changes.length - up - down;
   const meanChange = changes.length ? changes.reduce((sum, change) => sum + change, 0) / changes.length : null;
-  const totalVolume = numeric(stats.total24hVolume);
-  const totalMarketCap = numeric(stats.totalMarketCap);
-  const turnover = totalVolume != null && totalMarketCap != null && totalMarketCap > 0
-    ? (totalVolume / totalMarketCap) * 100
-    : null;
-  const topVolumeShare = totalVolume != null && totalVolume > 0 && volumeEntries.length
-    ? (volumeEntries.reduce((sum, entry) => sum + entry.volume, 0) / totalVolume) * 100
-    : null;
+  const assetsWithVolume = trackedCoins.filter((coin) => {
+    const volume = numeric(coin['24hVolume'] ?? coin.volume24h);
+    return volume != null && volume >= 0;
+  }).length;
   const emptyMessage = isError
-    ? 'Le flux de marché est indisponible. Vérifiez la clé CoinRanking.'
-    : 'Les statistiques réelles apparaîtront lorsque le flux de marché répondra.';
+    ? 'Market data is unavailable. Check the CoinRanking API connection.'
+    : 'Live market statistics will appear when the market feed responds.';
 
   const volumeData = {
     labels: volumeEntries.map(({ coin }) => coin.symbol),
     datasets: [{
-      label: 'Volume échangé sur 24 h (USD)',
+      label: '24-hour trading volume (USD)',
       data: volumeEntries.map(({ volume }) => volume),
       backgroundColor: volumeEntries.map((_, index) => index === 0 ? 'rgba(86,224,192,.86)' : 'rgba(86,168,255,.68)'),
       borderRadius: 6,
@@ -53,7 +49,7 @@ const AdvancedMarketStats = ({ coins = [], stats = {}, isError = false, updatedA
     }],
   };
   const breadthData = {
-    labels: ['En hausse', 'En baisse', 'Stable'],
+    labels: ['Gainers', 'Losers', 'Unchanged'],
     datasets: [{
       data: changes.length ? [up, down, unchanged] : [],
       backgroundColor: COLORS,
@@ -68,7 +64,7 @@ const AdvancedMarketStats = ({ coins = [], stats = {}, isError = false, updatedA
     maintainAspectRatio: false,
     plugins: {
       legend: { display: false },
-      tooltip: { callbacks: { label: (context) => ` ${formatUsd(context.parsed.x)} · 24 h` } },
+      tooltip: { callbacks: { label: (context) => ` ${formatUsd(context.parsed.x)} · 24h` } },
     },
     scales: {
       x: { beginAtZero: true, grid: { color: 'rgba(148,163,184,.14)' }, ticks: { color: '#a7b4c4', callback: (value) => `$${millify(Number(value))}` }, border: { display: false } },
@@ -81,7 +77,7 @@ const AdvancedMarketStats = ({ coins = [], stats = {}, isError = false, updatedA
     cutout: '68%',
     plugins: {
       legend: { display: false },
-      tooltip: { callbacks: { label: (context) => ` ${context.label}: ${context.raw} actif${context.raw === 1 ? '' : 's'}` } },
+      tooltip: { callbacks: { label: (context) => ` ${context.label}: ${context.raw} asset${context.raw === 1 ? '' : 's'}` } },
     },
   };
 
@@ -89,38 +85,38 @@ const AdvancedMarketStats = ({ coins = [], stats = {}, isError = false, updatedA
     <section className="dashboard-section advanced-market-section">
       <div className="section-heading advanced-section-heading">
         <div>
-          <Text className="panel-kicker">ANALYSE DU MARCHÉ</Text>
-          <Title level={3}>Volumes &amp; tendances en temps réel</Title>
-          <Text className="advanced-subtitle">CoinRanking · actualisation automatique toutes les 60 secondes{updatedAt ? ` · dernière réponse ${new Date(updatedAt).toLocaleTimeString()}` : ''}</Text>
+          <Text className="panel-kicker">MARKET ANALYTICS</Text>
+          <Title level={3}>Trading volume &amp; market trends</Title>
+          <Text className="advanced-subtitle">CoinRanking · refreshes every 60 seconds{updatedAt ? ` · last response ${new Date(updatedAt).toLocaleTimeString()}` : ''}</Text>
         </div>
         <Tag className={isError ? 'data-tag data-tag-error' : trackedCoins.length ? 'data-tag data-tag-live' : 'data-tag'}>
-          {isError ? 'FLUX INDISPONIBLE' : trackedCoins.length ? 'FLUX ACTIF' : 'EN ATTENTE DU FLUX'}
+          {isError ? 'FEED UNAVAILABLE' : trackedCoins.length ? 'LIVE FEED' : 'WAITING FOR DATA'}
         </Tag>
       </div>
 
       {!trackedCoins.length ? <div className="chart-empty advanced-empty">{emptyMessage}</div> : <>
         <Row gutter={[14, 14]} className="advanced-stats-grid">
-          <Col xs={12} xl={6}><Card className="stat-card advanced-stat-card"><Text className="stat-label">VOLUME TOTAL · 24 H</Text><Statistic value={formatUsd(stats.total24hVolume)} /><Text className="stat-foot">Marché global, valeur API</Text></Card></Col>
-          <Col xs={12} xl={6}><Card className="stat-card advanced-stat-card"><Text className="stat-label">VOLUME / CAPITALISATION</Text><Statistic value={turnover == null ? '—' : `${turnover.toFixed(2)}%`} /><Text className="stat-foot">Calculé avec les totaux globaux API</Text></Card></Col>
-          <Col xs={12} xl={6}><Card className="stat-card advanced-stat-card"><Text className="stat-label">VARIATION MOYENNE · 24 H</Text><Statistic value={formatPercent(meanChange)} /><Text className="stat-foot">Moyenne simple sur {changes.length || '—'} actifs chargés</Text></Card></Col>
-          <Col xs={12} xl={6}><Card className="stat-card advanced-stat-card"><Text className="stat-label">VOLUME DES 8 PRINCIPAUX</Text><Statistic value={topVolumeShare == null ? '—' : `${topVolumeShare.toFixed(2)}%`} /><Text className="stat-foot">Part du volume global déclarée</Text></Card></Col>
+          <Col xs={12} xl={6}><Card className="stat-card advanced-stat-card"><Text className="stat-label">GLOBAL 24H VOLUME</Text><Statistic value={formatUsd(stats.total24hVolume)} /><Text className="stat-foot">Reported by CoinRanking</Text></Card></Col>
+          <Col xs={12} xl={6}><Card className="stat-card advanced-stat-card"><Text className="stat-label">AVERAGE 24H CHANGE</Text><Statistic value={formatPercent(meanChange)} /><Text className="stat-foot">Simple average across {changes.length || '—'} assets with reported change</Text></Card></Col>
+          <Col xs={12} xl={6}><Card className="stat-card advanced-stat-card"><Text className="stat-label">GAINING ASSETS</Text><Statistic value={changes.length ? up : '—'} /><Text className="stat-foot">Positive 24-hour change · loaded assets</Text></Card></Col>
+          <Col xs={12} xl={6}><Card className="stat-card advanced-stat-card"><Text className="stat-label">ASSETS WITH VOLUME</Text><Statistic value={assetsWithVolume || '—'} /><Text className="stat-foot">Of {trackedCoins.length} loaded assets</Text></Card></Col>
         </Row>
 
         <Row gutter={[14, 14]} className="advanced-charts-row">
           <Col xs={24} xl={15}><Card className="panel-card advanced-panel">
-            <div className="panel-heading"><div><Text className="panel-kicker">VOLUME PAR ACTIF</Text><Title level={4}>Les actifs les plus échangés</Title></div><Tag className="subtle-tag">24 H · USD</Tag></div>
-            {volumeEntries.length ? <div className="chart-canvas advanced-volume-chart"><Bar data={volumeData} options={volumeOptions} /></div> : <div className="chart-empty">Le flux ne fournit pas de volume 24 h par actif.</div>}
-            <Text className="chart-caption">Volume déclaré par l’API pour chaque actif ; les données absentes ne sont pas remplacées par zéro.</Text>
+            <div className="panel-heading"><div><Text className="panel-kicker">VOLUME BY ASSET</Text><Title level={4}>Most actively traded</Title></div><Tag className="subtle-tag">24H · USD</Tag></div>
+            {volumeEntries.length ? <div className="chart-canvas advanced-volume-chart"><Bar data={volumeData} options={volumeOptions} /></div> : <div className="chart-empty">The feed does not provide per-asset 24-hour volume.</div>}
+            <Text className="chart-caption">Per-asset volume reported by the API. Missing values are not treated as zero.</Text>
           </Card></Col>
           <Col xs={24} xl={9}><Card className="panel-card advanced-panel breadth-panel">
-            <div className="panel-heading"><div><Text className="panel-kicker">LARGEUR DU MARCHÉ</Text><Title level={4}>Hausse vs baisse</Title></div><Tag className="subtle-tag">24 H</Tag></div>
+            <div className="panel-heading"><div><Text className="panel-kicker">MARKET BREADTH</Text><Title level={4}>Gainers vs losers</Title></div><Tag className="subtle-tag">24H</Tag></div>
             {changes.length ? <div className="breadth-content">
-              <div className="chart-canvas breadth-chart"><Doughnut data={breadthData} options={breadthOptions} /><div className="breadth-center"><strong>{changes.length}</strong><span>ACTIFS</span></div></div>
+              <div className="chart-canvas breadth-chart"><Doughnut data={breadthData} options={breadthOptions} /><div className="breadth-center"><strong>{changes.length}</strong><span>ASSETS</span></div></div>
               <div className="breadth-legend">
-                {[['En hausse', up, COLORS[0]], ['En baisse', down, COLORS[1]], ['Stable', unchanged, COLORS[2]]].map(([label, value, color]) => <div className="breadth-legend-row" key={label}><span className="legend-dot" style={{ background: color }} /><span>{label}</span><strong>{value}</strong></div>)}
+                {[[ 'Gainers', up, COLORS[0]], ['Losers', down, COLORS[1]], ['Unchanged', unchanged, COLORS[2]]].map(([label, value, color]) => <div className="breadth-legend-row" key={label}><span className="legend-dot" style={{ background: color }} /><span>{label}</span><strong>{value}</strong></div>)}
               </div>
-            </div> : <div className="chart-empty">Variations 24 h indisponibles.</div>}
-            <Text className="chart-caption">Nombre d’actifs chargés dont la variation 24 h est positive, négative ou nulle.</Text>
+            </div> : <div className="chart-empty">24-hour changes are unavailable.</div>}
+            <Text className="chart-caption">Count of loaded assets with a positive, negative or unchanged 24-hour price change.</Text>
           </Card></Col>
         </Row>
       </>}
