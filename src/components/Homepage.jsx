@@ -8,6 +8,7 @@ import { useGetCryptosQuery, useGetGlobalMarketDataQuery } from '../services/cry
 import Cryptocurrencies from './Cryptocurrencies';
 import News from './News';
 import AdvancedMarketStats from './AdvancedMarketStats';
+import PriceAlerts from './PriceAlerts';
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 const { Title, Text } = Typography;
 const PALETTE = ['#56e0c0', '#8b7dff', '#ffbd59', '#ff7085', '#56a8ff', '#b49aff', '#4cc9f0', '#f4a261', '#e76f51', '#90be6d'];
@@ -54,6 +55,7 @@ const Homepage = () => {
       <Text className="header-subtitle">A clear view of the crypto market, updated from live market data.</Text>
       {dataUnavailable && <Text className="api-notice">{isFetching ? 'Live data is loading. Values stay blank until the API returns them.' : 'Live prices are unavailable. Configure the CoinRanking RapidAPI key to display verified figures.'}</Text>}
     </div><div className="header-date">GLOBAL MARKETS <span>USD · 24H</span></div></header>
+    <PriceAlerts coins={coins} updatedAt={fulfilledTimeStamp} isError={isError} />
     <Row gutter={[14, 14]} className="stats-grid">
       <Col xs={12} xl={6}><Card className="stat-card"><Text className="stat-label">TOTAL MARKET CAP</Text><Statistic value={compactMoney(totalMarketCap)} /><Text className="stat-foot">{totalMarketCap != null ? 'Global crypto market capitalization' : globalMarketFetching ? 'Loading global market data' : globalMarketError ? 'Global market data request failed' : 'Global market cap unavailable'}</Text></Card></Col>
       <Col xs={12} xl={6}><Card className="stat-card"><Text className="stat-label">24H TRADING VOLUME</Text><Statistic value={compactMoney(globalStats.total24hVolume)} /><Text className="stat-foot">Global reported volume</Text></Card></Col>

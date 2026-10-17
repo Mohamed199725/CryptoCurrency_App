@@ -308,3 +308,64 @@ a:hover { color:var(--accent)!important; }
   .breadth-legend { width:100%; max-width:250px; }
   .advanced-stat-card .ant-statistic-content { font-size:15px!important; }
 }
+
+/* 24-hour price alerts */
+.price-alerts-section { margin:0 0 24px; }
+.price-alerts-card { background:#111924!important; border:1px solid var(--border)!important; border-radius:12px!important; }
+.price-alerts-card .ant-card-body { padding:20px; }
+.price-alerts-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; }
+.price-alerts-heading h3 { display:flex; align-items:center; gap:9px; color:#edf2f7!important; font:700 20px 'Manrope',sans-serif!important; margin:5px 0 5px!important; }
+.price-alerts-heading h3 .anticon { color:var(--accent); font-size:17px; }
+.price-alerts-subtitle { display:block; max-width:760px; color:#aebbc9!important; font-size:11px; line-height:1.55; }
+.price-alert-form { display:grid; grid-template-columns:minmax(190px,1.5fr) minmax(160px,1fr) minmax(140px,.8fr) auto; align-items:end; gap:12px; margin:20px 0 10px; }
+.price-alert-field { display:flex; min-width:0; flex-direction:column; gap:6px; }
+.price-alert-field label { color:#cbd5e0; font-size:10px; font-weight:600; }
+.price-alert-field .ant-select { width:100%; }
+.price-alert-field .ant-select-selector,.price-alert-field .ant-input-number,.price-alert-field .ant-input-number-group-addon { min-height:40px!important; color:#edf3f8!important; background:#0d141d!important; border-color:rgba(148,163,184,.24)!important; }
+.price-alert-field .ant-select-selection-item,.price-alert-field .ant-select-selection-placeholder,.price-alert-field .ant-input-number-input { color:#edf3f8!important; }
+.price-alert-field .ant-input-number-group-wrapper { width:100%; }
+.price-alert-field .ant-input-number-group-addon { color:#bac6d3!important; }
+.price-alert-add { min-height:40px; color:#081410!important; background:var(--accent)!important; border:0!important; font-size:11px; font-weight:700; }
+.price-alert-add:disabled { color:#728196!important; background:#26313d!important; }
+.price-alert-baseline { display:block; color:#9eacbb!important; font-size:10px; line-height:1.5; margin:8px 0 20px; }
+.price-alert-baseline strong { margin-left:3px; }
+.price-alert-list-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:18px 0 8px; padding-top:14px; border-top:1px solid var(--border); }
+.price-alert-list { display:flex; flex-direction:column; }
+.price-alert-item { display:grid; grid-template-columns:minmax(180px,1.3fr) minmax(150px,.8fr) auto 36px; align-items:center; gap:14px; padding:12px 4px; border-bottom:1px solid rgba(148,163,184,.1); }
+.price-alert-item-main { display:flex; align-items:center; gap:11px; min-width:0; }
+.price-alert-icon { display:grid; width:32px; height:32px; flex:none; place-items:center; color:var(--accent); background:rgba(86,224,192,.09); border:1px solid rgba(86,224,192,.16); border-radius:9px; }
+.price-alert-item-copy { display:flex; min-width:0; flex-direction:column; gap:3px; }
+.price-alert-item-copy strong { overflow:hidden; color:#edf3f8; font-size:11px; text-overflow:ellipsis; white-space:nowrap; }
+.price-alert-item-copy small { margin-left:4px; color:#97a7b8; font-size:9px; }
+.price-alert-item-copy > span,.price-alert-item-current > span { color:#aebbc9; font-size:10px; }
+.price-alert-item-current { display:flex; flex-direction:column; gap:3px; }
+.price-alert-item-current strong { font-size:12px; }
+.price-alert-item-status { display:flex; flex-direction:column; align-items:flex-end; gap:4px; }
+.price-alert-item-status > span { color:#95a4b4; font-size:9px; white-space:nowrap; }
+.price-alert-note { margin-top:14px; color:#b8c6d4!important; background:rgba(86,168,255,.06)!important; border-color:rgba(86,168,255,.16)!important; }
+.price-alert-note .ant-alert-message { color:#c9d5e1!important; font-size:10px; line-height:1.5; }
+.price-alert-note .ant-alert-icon { color:#76b7ff!important; }
+.price-alert-notification { background:#17212c!important; border:1px solid rgba(86,224,192,.3)!important; }
+.price-alert-notification .ant-notification-notice-message { color:#edf3f8!important; }
+.price-alert-notification .ant-notification-notice-description { color:#becbd8!important; }
+@media (max-width:800px) {
+  .price-alerts-card .ant-card-body { padding:17px; }
+  .price-alert-form { grid-template-columns:repeat(2,minmax(0,1fr)); gap:11px; }
+  .price-alert-add { align-self:end; }
+  .price-alert-item { grid-template-columns:minmax(150px,1.2fr) minmax(120px,.8fr) auto 32px; gap:10px; }
+}
+@media (max-width:560px) {
+  .price-alerts-card .ant-card-body { padding:15px 12px; }
+  .price-alerts-heading { flex-direction:column; gap:9px; }
+  .price-alerts-heading h3 { font-size:18px!important; }
+  .price-alert-form { grid-template-columns:minmax(0,1fr); gap:9px; margin:15px 0 8px; }
+  .price-alert-field label { font-size:10px; }
+  .price-alert-add { width:100%; }
+  .price-alert-item { grid-template-columns:minmax(0,1fr) auto 34px; gap:8px; }
+  .price-alert-item-main { grid-column:1; }
+  .price-alert-item-current { grid-column:1; margin-left:43px; }
+  .price-alert-item-status { grid-column:2; grid-row:1 / span 2; }
+  .price-alert-item > .ant-btn { grid-column:3; grid-row:1 / span 2; }
+  .price-alert-item-status > span { white-space:normal; text-align:right; }
+  .price-alert-note .ant-alert-message { font-size:9px; }
+}
